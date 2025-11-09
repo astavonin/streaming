@@ -2,7 +2,10 @@
 #include <gst/gst.h>
 #include <gst/rtp/gstrtpbuffer.h>   // <-- use the buffer API
 
-static GstFlowReturn add_ext_probe(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+static GstPadProbeReturn add_ext_probe(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+    (void)pad;        // Unused parameter
+    (void)user_data;  // Unused parameter
+
     GstBuffer *buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (!buf) return GST_PAD_PROBE_OK;
 

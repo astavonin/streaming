@@ -3,7 +3,10 @@
 #include <gst/gst.h>
 #include <gst/rtp/gstrtpbuffer.h>
 
-static GstFlowReturn extract_ext_probe(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+static GstPadProbeReturn extract_ext_probe(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+    (void)pad;        // Unused parameter
+    (void)user_data;  // Unused parameter
+
     GstBuffer *buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (!buf) return GST_PAD_PROBE_OK;
 
@@ -38,6 +41,7 @@ static GstFlowReturn extract_ext_probe(GstPad *pad, GstPadProbeInfo *info, gpoin
 }
 
 static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data) {
+    (void)bus;  // Unused parameter
     GMainLoop *loop = (GMainLoop *)data;
 
     switch (GST_MESSAGE_TYPE(msg)) {
