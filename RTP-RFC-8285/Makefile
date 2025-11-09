@@ -1,27 +1,32 @@
-# Simple Makefile for RTP header extension injector
+# Simple Makefile for RTP header extension sender/receiver
 # Works with GStreamer ≥1.18 (tested on Ubuntu 24.04)
 
-APP       := rtp_ext_inject
-SRC       := rtp_ext_inject.c
+SENDER    := rtp_ext_inject
+RECEIVER  := rtp_ext_reader
+APPS      := $(SENDER) $(RECEIVER)
 
 # Get compiler flags and libs from pkg-config
 PKGS      := gstreamer-1.0 gstreamer-rtp-1.0 gstreamer-video-1.0
 CFLAGS    := -Wall -Wextra -O2 `pkg-config --cflags $(PKGS)`
 LIBS      := `pkg-config --libs $(PKGS)`
 
-# Default build rule
-all: $(APP)
+# Default build rule - build both
+all: $(APPS)
 
-$(APP): $(SRC)
+$(SENDER): rtp_ext_inject.c
 	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
 
-# Install binary (optional)
-install: $(APP)
-	sudo install -m 755 $(APP) /usr/local/bin/$(APP)
+$(RECEIVER): rtp_ext_reader.c
+	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
+
+# Install binaries (optional)
+install: $(APPS)
+	sudo install -m 755 $(SENDER) /usr/local/bin/$(SENDER)
+	sudo install -m 755 $(RECEIVER) /usr/local/bin/$(RECEIVER)
 
 # Clean up build artifacts
 clean:
-	rm -f $(APP)
+	rm -f $(APPS)
 
 # Print compiler flags for debugging
 info:

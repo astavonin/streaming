@@ -13,8 +13,9 @@ For a full explanation and background, read the accompanying article:
 
 ```
 RTP-RFC-8285/
-├── Makefile          # Simple GStreamer build for sender example
-└── rtp_ext_inject.c  # GStreamer pad probe injecting stream ID metadata into RTP packets
+├── Makefile          # Simple GStreamer build for sender/receiver
+├── rtp_ext_inject.c  # Sender: GStreamer pad probe injecting stream ID into RTP packets
+└── rtp_ext_reader.c  # Receiver: Extracts and displays RFC-8285 header extensions
 ```
 
 ---
@@ -33,13 +34,37 @@ Then build:
 make
 ```
 
-This produces a small binary called `rtp_ext_inject`.
+This produces two binaries: `rtp_ext_inject` (sender) and `rtp_ext_reader` (receiver).
 
 ---
 
 ## **Run**
 
+### Option 1: Using the Custom Receiver (Recommended)
+
 Start the receiver in one terminal:
+
+```bash
+./rtp_ext_reader
+```
+
+Then launch the sender in another terminal:
+
+```bash
+./rtp_ext_inject
+```
+
+You should see:
+- A test pattern video window displaying a moving ball
+- Console output showing extracted RFC-8285 header extensions:
+  ```
+  ✓ RTP Extension found (ID=1, size=4): 12 34 56 78
+    → Decoded Stream ID: 0x12345678
+  ```
+
+### Option 2: Using gst-launch (Basic)
+
+Start a basic receiver in one terminal:
 
 ```bash
 gst-launch-1.0 udpsrc port=5000 caps="application/x-rtp,media=video,encoding-name=H264,payload=96,clock-rate=90000" ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! autovideosink sync=false
@@ -51,5 +76,5 @@ Then launch the sender:
 ./rtp_ext_inject
 ```
 
-You should see a test pattern and — if you inspect traffic in Wireshark — a **Header Extension** field with a short stream ID, typically `12 34 56 78`.
+You should see the test pattern. To verify the header extensions, inspect the traffic in Wireshark (filter: `udp.port==5000`) — you'll see a **Header Extension** field with stream ID `12 34 56 78`.
 
